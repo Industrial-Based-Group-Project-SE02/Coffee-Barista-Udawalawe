@@ -40,3 +40,22 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Add these custom styles */
+.font-display {
+  font-family: 'Playfair Display', serif;
+}
+
+.wood-texture {
+  background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 100%), 
+              repeating-linear-gradient(90deg, #3d2817 0px, #2d1f17 2px, #3d2817 4px);
+}
+
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(204, 85, 0, 0.3);
+}
