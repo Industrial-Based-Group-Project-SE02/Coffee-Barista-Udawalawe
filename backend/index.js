@@ -1,20 +1,50 @@
-const express = require("express");
-const cors = require("cors");
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
+import cors from "cors";
+import bodyParser from "body-parser";
+
+import userRouter from "./routes/userRoute.js";
+
+dotenv.config();
 
 const app = express();
-const PORT = 5000;
 
 app.use(cors());
 app.use(express.json());
+app.use(bodyParser.json());
 
-app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
+app.use((req, res, next) => {
+    const tokenString = req.header("Authorization");
+
+    if (tokenString) {
+        const token = tokenString.replace("Bearer ", "");
+
+        jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+            if (!err) {
+                req.user = decoded; // Attach decoded token to request
+            } else {
+                console.error("Invalid token:", err.message); // Log the error
+            }
+            next(); // Continue processing the request
+        });
+    } else {
+        next(); // Proceed without a token (guest access)
+    }
 });
 
-app.get("/api/message", (req, res) => {
-  res.json({ message: "Hello from backend" });
-});
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// Routes
+app.use("/api/users", userRouter);
+
+// DB + server start
+mongoose
+  .connect(process.env.MONGO_URL)
+  .then(() => {
+    console.log("Connected to MongoDB");
+    app.listen(3000, () => console.log("Server is running on port 3000"));
+  })
+  .catch((err) => {
+    console.log("Mongo connection error:", err.message);
+  });
