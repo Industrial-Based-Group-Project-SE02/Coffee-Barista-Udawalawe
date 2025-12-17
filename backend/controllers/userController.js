@@ -11,25 +11,18 @@ export function createUser(req, res) {
         firstname: req.body.firstname,
         lastname: req.body.lastname,
         password: hashedPassword,
-        role: req.body.role || "customer", // Default to customer if not provided
-        isBlocked: req.body.isBlocked || false // Fixed: was req.body.isBlocked.false
+        role: req.body.role ,
+        isBlocked: req.body.isBlocked
     });
-    user.save()
+    user
+    .save()
         .then((result) => {
-            res.status(201).send({ 
-                success: true,
+            res.json({
                 message: "User created successfully",
-                user: {
-                    email: result.email,
-                    firstname: result.firstname,
-                    lastname: result.lastname,
-                    role: result.role
-                }
-            });
+            })
         })
         .catch((error) => {
-            res.status(500).send({ 
-                success: false,
+            res.status(500).json({ 
                 message: "Error creating user", 
                 error: error.message 
             });
@@ -44,18 +37,16 @@ export function loginUser(req, res) {
         .then((user) => {
             if (user == null) {
                 return res.status(404).send({ 
-                    success: false,
                     message: "User not found" 
                 });
             }
             if (user.isBlocked === true) { // Fixed: was true0
-                return res.status(403).send({ 
-                    success: false,
-                    message: "User is blocked" 
+                return res.status(403).json({ 
+                    message: "Your Account is blocked" 
                 });
             }
-            const passwordIsValid = bcrypt.compareSync(password, user.password);
-            if (passwordIsValid) { // Fixed: was isPasswordCorrect (undefined variable)
+            const ispasswordIsValid = bcrypt.compareSync(password, user.password);
+            if (ispasswordIsValid) { // Fixed: was isPasswordCorrect (undefined variable)
                 const token = jwt.sign(
                     {
                         email: user.email,
@@ -65,20 +56,17 @@ export function loginUser(req, res) {
                         isBlocked: user.isBlocked
                     },
                     process.env.JWT_SECRET_KEY,
-                    { expiresIn: '24h' } // Added token expiration
                 );
+
                 res.json({
-                    success: true,
                     message: "Login successful",
                     token: token,
                     role: user.role,
                     email: user.email,
                     firstname: user.firstname,
-                    lastname: user.lastname
                 });
             } else {
-                res.status(401).send({ 
-                    success: false,
+                res.status(401).json({ 
                     message: "Invalid password" 
                 });
             }
@@ -86,7 +74,6 @@ export function loginUser(req, res) {
         .catch((error) => { // Fixed: was err
             console.error("Login error:", error);
             res.status(500).json({
-                success: false,
                 message: "Internal server error" 
             });
         });
@@ -135,14 +122,8 @@ export function isCrew(req) {
 export async function getAllUsers(req, res) {
     try {
         const users = await User.find(
-            { role: { $in: ['customer', 'crew', 'cashier'] } },
-            { password: 0 } // Exclude password from response
-        );
-        res.status(200).json({
-            success: true,
-            count: users.length,
-            users: users
-        });
+            { role: { $in: ['customer', 'crew', 'cashier']}});
+        res.json(users);
     } catch (error) {
         res.status(500).json({ 
             success: false,
@@ -192,7 +173,7 @@ export async function toggleUserBlock(req, res) {
 
 export async function userCount(req, res) {
     try {
-        const count = await User.countDocuments({ role: 'customer' });
+        const count = await User.countDocuments({ role: { $in: [ "customer", "crew", "cashier"] } });
         res.status(200).json({
             success: true,
             count: count,
@@ -212,18 +193,21 @@ export async function UpdateProfile(req, res) {
         const { email } = req.params;
         const { firstname, lastname, password } = req.body;
 
-        const updateData = { // Fixed: was updates in some places, updateData in others
+        // ✅ FIXED: Use consistent variable name 'updateData'
+        const updateData = {
             firstname,
             lastname,
         };
         
+        // ✅ FIXED: Changed 'updates' to 'updateData'
         if (password) {
-            updateData.password = bcrypt.hashSync(password, 8); // Fixed: was await bcrypt.hash (should use hashSync or make function async properly)
+            updateData.password = bcrypt.hashSync(password, 8);
         }
 
+        // ✅ FIXED: Changed 'updates' to 'updateData'
         const result = await User.updateOne(
             { email }, 
-            { $set: updateData } // Fixed: was updates, now updateData
+            { $set: updateData }
         );
         
         if (result.matchedCount === 0) {
@@ -238,6 +222,7 @@ export async function UpdateProfile(req, res) {
             message: "Profile updated successfully" 
         });
     } catch (error) {
+        console.error("UpdateProfile error:", error);
         res.status(500).json({
             success: false, 
             message: "Error updating profile", 
@@ -249,22 +234,9 @@ export async function UpdateProfile(req, res) {
 export async function viewDetails(req, res) {
     const email = req.params.email;
     try {
-        const user = await User.findOne(
-            { email: email },
-            { password: 0 } // Exclude password from response
-        );
+        const user = await User.findOne({ email: email });
+        res.json(user);
         
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found"
-            });
-        }
-        
-        res.json({
-            success: true,
-            user: user
-        });
     } catch (error) {
         res.status(500).json({
             success: false,
@@ -272,4 +244,5 @@ export async function viewDetails(req, res) {
             error: error.message
         });
     }
+        
 }

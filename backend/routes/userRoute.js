@@ -27,8 +27,8 @@ userRouter.post("/login", loginUser);
 userRouter.get("/getUsers", getAllUsers);
 userRouter.put("/blocked/:email", toggleUserBlock);
 userRouter.get("/countUsers", userCount);
-userRouter.put("/updateProfile", UpdateProfile);
-userRouter.get("/view/:email", viewDetails);
+userRouter.put("/updateProfile/:email", UpdateProfile);
+userRouter.get("/getProfile/:email", viewDetails);
 
 
 

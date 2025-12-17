@@ -11,6 +11,7 @@ import {
   Star,
   Award,
   Sparkles,
+  Calendar,
 } from "lucide-react";
 
 const CustomerNavbar = () => {
@@ -42,6 +43,13 @@ const CustomerNavbar = () => {
       icon: <Package size={22} />,
       gradient: "from-yellow-500 to-amber-600",
     },
+    {
+      name: "Reservation",
+      path: "/reservation",
+      icon: <Calendar size={22} />,
+      gradient: "from-amber-600 to-orange-700",
+    },
+
     {
       name: "Edit Profile",
       path: "/edit-profile",
@@ -187,29 +195,7 @@ const CustomerNavbar = () => {
           })}
         </div>
 
-        {/* Loyalty Card */}
-        <div className="px-4 py-3">
-          <div className="relative overflow-hidden glass-strong p-4 rounded-2xl border border-amber-500/30 animate-pulse-glow">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-yellow-500/20 to-amber-600/20 rounded-full blur-2xl"></div>
-
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-2">
-                <Award className="w-5 h-5 text-yellow-400" />
-                <span className="text-sm font-bold text-amber-200">Loyalty Status</span>
-              </div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-lg font-black bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">
-                  Gold Member
-                </span>
-                <span className="text-amber-300 text-sm font-bold">240 pts</span>
-              </div>
-              <div className="w-full h-2 bg-stone-800 rounded-full overflow-hidden">
-                <div className="h-full w-4/5 bg-gradient-to-r from-yellow-500 to-amber-600 rounded-full"></div>
-              </div>
-              <p className="text-xs text-amber-300/60 mt-2">60 points to Platinum</p>
-            </div>
-          </div>
-        </div>
+        
       </div>
 
       {/* Bottom Profile Section */}
@@ -232,7 +218,7 @@ const CustomerNavbar = () => {
               <p className="text-base font-bold text-amber-100">{firstname}</p>
               <p className="text-sm text-amber-300/70 flex items-center gap-1">
                 <Heart className="w-3 h-3" fill="currentColor" />
-                <span>Premium Customer</span>
+                <span>Customer</span>
               </p>
             </div>
           </div>
