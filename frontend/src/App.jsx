@@ -11,6 +11,7 @@ import CartPage from "./Pages/CartPage.jsx";
 
 import CustomerDash from "./Pages/Customer/CustomerDash.jsx";
 import EditProfile from "./Pages/Customer/editProfile.jsx";
+import Reservation from "./Pages/Customer/reservation.jsx";
 
 import CustomerLayout from "./layout/CustomerLayout.jsx";
 import PublicLayout from "./layout/publicLayout.jsx";
@@ -56,6 +57,7 @@ function App() {
         <Route element={<CustomerLayout />}>
           <Route path="/customer-dashboard" element={<CustomerDash />} />
           <Route path="/edit-profile" element={<EditProfile />} />
+          <Route path="/reservation" element={<Reservation />} />
         </Route>
       </Routes>
     </>

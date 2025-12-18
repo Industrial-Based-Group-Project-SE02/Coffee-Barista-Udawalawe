@@ -6,6 +6,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 
 import userRouter from "./routes/userRoute.js";
+import reservationRouter from "./routes/reservationRoute.js";
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use("/api/users", userRouter);
+app.use("/api/reservations", reservationRouter);
 
 // DB + server start
 mongoose
@@ -48,3 +50,7 @@ mongoose
   .catch((err) => {
     console.log("Mongo connection error:", err.message);
   });
+
+  app.listen(30000, () => {
+    console.log("Server is running on port 30000");
+});

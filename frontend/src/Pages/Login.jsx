@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, Coffee, Heart, Sparkles, ArrowRight, Facebook, Chrome, Apple, CheckCircle, X } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Coffee, Heart, Sparkles } from 'lucide-react';
 
 function Login() {
   const navigate = useNavigate();
@@ -14,60 +14,66 @@ function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleLogin(e) {
-  e.preventDefault();
-  if (isSubmitting) return;
+    e.preventDefault();
+    if (isSubmitting) return;
 
-  if (!email || !password) {
-    toast.error("Please fill in all fields");
-    return;
-  }
-
-  setIsSubmitting(true);
-
-  try {
-    const response = await axios.post("http://localhost:3000/api/users/login", {
-      email,
-      password,
-    });
-
-    toast.success("Login successful");
-
-    const { token, role, email: userEmail, firstname } = response.data;
-
-    localStorage.setItem("token", token);
-    localStorage.setItem("userRole", role);
-    localStorage.setItem("email", userEmail || email);
-    localStorage.setItem("firstname", firstname || "");
-
-    if (rememberMe) {
-      localStorage.setItem("rememberEmail", email);
-    } else {
-      localStorage.removeItem("rememberEmail");
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
     }
 
-    // realistic delay before redirect
-    setTimeout(() => {
-      setIsSubmitting(false);
+    setIsSubmitting(true);
 
-      if (role === "admin") {
-        navigate("/admin-dashboard");
-      } else if (role === "cashier") {
-        navigate("/cashier-dashboard");
-      } else if (role === "crew") {
-        navigate("/crew-dashboard");
-      } else if (role === "customer") {
-        navigate("/customer-dashboard");
+    try {
+      const response = await axios.post("http://localhost:3000/api/users/login", {
+        email,
+        password,
+      });
+
+      toast.success("Login successful");
+
+      const { token, role, email: apiEmail, firstname } = response.data;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("userRole", role);
+
+      // ✅ set the key your EditProfile uses
+      localStorage.setItem("userEmail", apiEmail || email);
+
+      // optional: keep this too (some pages may use it)
+      localStorage.setItem("email", apiEmail || email);
+
+
+      // ✅ navbar uses username
+      localStorage.setItem("username", firstname || "");
+
+      if (rememberMe) {
+        localStorage.setItem("rememberEmail", email);
       } else {
-        toast.error("Unknown user role");
+        localStorage.removeItem("rememberEmail");
       }
-    }, 1200);
 
-  } catch (error) {
-    setIsSubmitting(false);
-    toast.error(error.response?.data?.message || "Login failed");
+      setTimeout(() => {
+        setIsSubmitting(false);
+
+        if (role === "admin") {
+          navigate("/admin-dashboard");
+        } else if (role === "cashier") {
+          navigate("/cashier-dashboard");
+        } else if (role === "crew") {
+          navigate("/crew-dashboard");
+        } else if (role === "customer") {
+          navigate("/customer-dashboard");
+        } else {
+          toast.error("Unknown user role");
+        }
+      }, 1200);
+
+    } catch (error) {
+      setIsSubmitting(false);
+      toast.error(error.response?.data?.message || "Login failed");
+    }
   }
-}
-
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-stone-950 flex items-center justify-center py-12 px-4">
