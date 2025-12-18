@@ -220,7 +220,7 @@ function Home() {
               </div>
 
               {/* Hero Text */}
-              <div className="space-y-6 animate-slide-left stagger-2">
+              <div className="space-y-6 mb-4 animate-slide-left stagger-2">
                 <h2 className="text-4xl lg:text-6xl font-bold text-amber-50 leading-tight">
                   Brewing{' '}
                   <span className="relative inline-block">
@@ -240,7 +240,7 @@ function Home() {
               </div>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start animate-slide-left stagger-3">
+              <div className="flex flex-col sm:flex-row gap-8 mb-4 justify-center lg:justify-start animate-slide-left stagger-4">
                 <Link to="/menu" className="group relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity"></div>
                   <button className="relative bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold px-10 py-5 rounded-2xl hover:from-amber-600 hover:to-orange-700 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-2xl text-lg w-full sm:w-auto">

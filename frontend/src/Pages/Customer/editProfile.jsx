@@ -164,7 +164,9 @@ export default function EditProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-950 flex items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-stone-950 flex items-center justify-center px-4 sm:px-0 py-0 relative overflow-hidden">
+
+
       {/* Background decorations */}
       <div className="absolute inset-0">
         <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-amber-500/20 rounded-full blur-3xl"></div>

@@ -42,3 +42,11 @@ html, body {
   transform: translateY(-8px);
   box-shadow: 0 20px 40px rgba(204, 85, 0, 0.3);
 }
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #0c0a09; /* tailwind stone-950 */
+}

@@ -13,6 +13,7 @@ export function createUser(req, res) {
         password: hashedPassword,
         role: req.body.role ,
         isBlocked: req.body.isBlocked
+        
     });
     user
     .save()
@@ -49,6 +50,7 @@ export function loginUser(req, res) {
             if (ispasswordIsValid) { // Fixed: was isPasswordCorrect (undefined variable)
                 const token = jwt.sign(
                     {
+                        id : user._id,
                         email: user.email,
                         firstname: user.firstname,
                         lastname: user.lastname,
