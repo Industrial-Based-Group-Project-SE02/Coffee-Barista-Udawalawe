@@ -8,6 +8,8 @@ import About from "./Pages/About.jsx";
 import Login from "./Pages/Login.jsx";
 import Register from "./Pages/Registration.jsx";
 import CartPage from "./Pages/CartPage.jsx";
+import Blog from "./Pages/Blog.jsx";
+import BlogArticle from "./Pages/BlogArticle.jsx";
 
 import CustomerDash from "./Pages/Customer/CustomerDash.jsx";
 import EditProfile from "./Pages/Customer/editProfile.jsx";
@@ -52,6 +54,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogArticle />} />
         </Route>
 
         <Route element={<CustomerLayout />}>

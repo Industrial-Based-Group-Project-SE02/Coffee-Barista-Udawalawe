@@ -1,4 +1,4 @@
-import { ShoppingCart, Coffee, Menu as MenuIcon, X } from "lucide-react";
+import { ShoppingCart, Coffee, Menu as MenuIcon, X, BookOpen } from "lucide-react"; // Add BookOpen
 import { useState } from "react";
 import { VscAccount } from "react-icons/vsc";
 import { Link, useNavigate } from "react-router-dom";
@@ -15,7 +15,7 @@ export default function Navbar() {
     } else if (role === "seller") {
       navigate("/sellerpage");
     } else if (role === "customer") {
-      navigate("/buyer-dashboard");
+      navigate("/customer-dashboard"); // Fixed from "buyer-dashboard" to "customer-dashboard"
     } else if (role === "delivery") {
       navigate("/delivery-dashboard");
     }
@@ -106,7 +106,21 @@ export default function Navbar() {
             <div className="absolute bottom-1.5 left-4 right-4 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>
           </Link>
 
-         
+          {/* ADD BLOG LINK HERE */}
+          <Link
+            to="/blog"
+            className="group relative px-4 py-2.5 text-amber-200/90 font-medium text-base transition-all duration-300 hover:text-amber-100 rounded-xl no-underline"
+          >
+            <span className="relative z-10 flex items-center space-x-2">
+              <span className="text-2xl group-hover:scale-110 transition-transform duration-300">
+                <BookOpen className="w-5 h-5" />
+              </span>
+              <span>Blog</span>
+            </span>
+            
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="absolute bottom-1.5 left-4 right-4 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>
+          </Link>
 
           <Link
             to="/about"
@@ -161,9 +175,6 @@ export default function Navbar() {
             className="group relative p-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 hover:border-amber-400/40 transition-all duration-300 no-underline"
           > 
             <ShoppingCart className="w-5 h-5 text-amber-300 group-hover:text-amber-200 group-hover:scale-110 transition-all duration-300" />
-            
-            {/* Notification badge (optional) */}
-            {/* <span className="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">3</span> */}
           </Link>
           
           {/* Account Button */}
@@ -215,13 +226,16 @@ export default function Navbar() {
               <span>Menu</span>
             </Link>
 
+            {/* ADD BLOG LINK TO MOBILE MENU */}
             <Link
-              to="/order"
+              to="/blog"
               onClick={() => setIsMenuOpen(false)}
               className="group w-full text-left px-4 py-3 text-amber-200/90 font-medium hover:bg-amber-500/10 rounded-xl transition-all duration-300 flex items-center space-x-3 text-base no-underline border border-transparent hover:border-amber-500/20"
             >
-              <span className="text-lg group-hover:scale-110 transition-transform duration-300">🛒</span>
-              <span>Order</span>
+              <span className="text-lg group-hover:scale-110 transition-transform duration-300">
+                <BookOpen className="w-5 h-5" />
+              </span>
+              <span>Blog</span>
             </Link>
 
             <Link
