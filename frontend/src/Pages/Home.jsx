@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
+import toast from 'react-hot-toast'
 import { Coffee, Users, ShoppingCart, Clock, Shield, Star, ArrowRight, Heart, Sparkles, Zap, Award, TrendingUp } from 'lucide-react'
 
 function Home() {
@@ -30,6 +32,101 @@ function Home() {
 
     return () => observer.disconnect()
   }, [])
+
+  // Feedbacks (testimonials) state and fetch
+  const [feedbacks, setFeedbacks] = useState([])
+  const [fbLoading, setFbLoading] = useState(true)
+
+  const fetchFeedbacks = async () => {
+    try {
+      setFbLoading(true)
+      const res = await axios.get('http://localhost:3000/api/feedbacks')
+      if (res.data?.success) setFeedbacks(res.data.feedbacks)
+    } catch (err) {
+      console.error('Error fetching feedbacks:', err)
+      toast.error('Unable to load customer feedbacks')
+    } finally {
+      setFbLoading(false)
+    }
+  }
+
+  useEffect(() => { fetchFeedbacks() }, [])
+
+  const FeedbackForm = ({ onSuccess }) => {
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [message, setMessage] = useState('')
+    const [rating, setRating] = useState(5)
+    const [submitting, setSubmitting] = useState(false)
+
+    const submit = async (e) => {
+      e.preventDefault()
+      if (!name || !message) return toast.error('Name and message are required')
+      setSubmitting(true)
+      const t = toast.loading('Sending feedback...')
+      try {
+        await axios.post('http://localhost:3000/api/feedbacks', { name, email, message, rating })
+        toast.success('Feedback submitted. Thank you!', { id: t })
+        setName(''); setEmail(''); setMessage(''); setRating(5)
+        onSuccess?.()
+      } catch (err) {
+        console.error(err)
+        toast.error('Failed to submit feedback', { id: t })
+      } finally {
+        setSubmitting(false)
+      }
+    }
+
+    return (
+      <form onSubmit={submit} className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name*" className="w-full p-3 rounded bg-stone-900 text-white" />
+          <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email (optional)" className="w-full p-3 rounded bg-stone-900 text-white" />
+        </div>
+        <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Your feedback*" className="w-full p-3 rounded bg-stone-900 text-white min-h-[120px]" />
+        <div className="flex items-center gap-2">
+          <label className="text-amber-300">Rating:</label>
+          <select value={rating} onChange={(e) => setRating(parseInt(e.target.value))} className="p-2 rounded bg-stone-900 text-white">
+            {[5,4,3,2,1].map(r => <option key={r} value={r}>{r} stars</option>)}
+          </select>
+        </div>
+        <div className="flex justify-end">
+          <button disabled={submitting} className="px-6 py-3 bg-amber-500 rounded text-white">
+            {submitting ? 'Sending...' : 'Send Feedback'}
+          </button>
+        </div>
+      </form>
+    )
+  }
+
+  const Testimonials = () => {
+    if (fbLoading) return <p className="text-center text-amber-300">Loading feedbacks...</p>
+    const list = feedbacks.length ? feedbacks : [
+      { name: "Priya Fernando", role: "Regular Customer", rating: 5, text: "Best coffee in Udawalawe! The atmosphere is cozy and the baristas really know their craft." },
+      { name: "Kamal Silva", role: "Coffee Enthusiast", rating: 5, text: "I visit every morning before work. Their cappuccino is absolutely perfect and service is always friendly." },
+      { name: "Dilini Perera", role: "Local Resident", rating: 5, text: "A hidden gem! Premium quality coffee at reasonable prices. Highly recommend the caramel latte." }
+    ]
+
+    return (
+      <div className="grid md:grid-cols-3 gap-8">
+        {list.map((t, i) => (
+          <div key={t._id || i} className={`card-3d glass-strong p-8 rounded-3xl border border-amber-500/20 hover:border-amber-400/40 transition-all duration-500 ${isVisible['animate-testimonials'] ? `animate-slide-up stagger-${i + 1}` : ''}`}>
+            <div className="flex gap-1 mb-4">
+              {[...Array(t.rating || 5)].map((_, j) => (<Star key={j} className="w-5 h-5 text-yellow-400 fill-current" />))}
+            </div>
+            <p className="text-amber-200/80 mb-6 leading-relaxed italic">"{t.message || t.text}"</p>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold text-xl">{(t.name || 'C')[0]}</div>
+              <div>
+                <div className="text-amber-50 font-bold">{t.name}</div>
+                <div className="text-amber-300/60 text-sm">{t.role || ''}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="w-full min-h-screen overflow-hidden bg-stone-950">
@@ -477,47 +574,29 @@ function Home() {
         </div>
         
         <div className="container mx-auto px-6 relative z-10">
-          <div className={`text-center mb-20 ${isVisible['animate-testimonials'] ? 'animate-slide-up' : ''}`}>
+          <div className={`text-center mb-10 ${isVisible['animate-testimonials'] ? 'animate-slide-up' : ''}`}>
             <h2 className="text-5xl lg:text-6xl font-bold text-amber-50 mb-6">
               What Our{' '}
               <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
                 Customers Say
               </span>
             </h2>
-            <p className="text-xl text-amber-200/80">
-              Join thousands of happy coffee lovers in Udawalawe
+            <p className="text-xl text-amber-200/80 max-w-3xl mx-auto">
+              Join thousands of happy coffee lovers in Udawalawe — leave your feedback below and help others discover us.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { name: "Priya Fernando", role: "Regular Customer", rating: 5, text: "Best coffee in Udawalawe! The atmosphere is cozy and the baristas really know their craft." },
-              { name: "Kamal Silva", role: "Coffee Enthusiast", rating: 5, text: "I visit every morning before work. Their cappuccino is absolutely perfect and service is always friendly." },
-              { name: "Dilini Perera", role: "Local Resident", rating: 5, text: "A hidden gem! Premium quality coffee at reasonable prices. Highly recommend the caramel latte." }
-            ].map((testimonial, i) => (
-              <div
-                key={i}
-                className={`card-3d glass-strong p-8 rounded-3xl border border-amber-500/20 hover:border-amber-400/40 transition-all duration-500 ${isVisible['animate-testimonials'] ? `animate-slide-up stagger-${i + 1}` : ''}`}
-              >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-amber-200/80 mb-6 leading-relaxed italic">
-                  "{testimonial.text}"
-                </p>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold text-xl">
-                    {testimonial.name[0]}
-                  </div>
-                  <div>
-                    <div className="text-amber-50 font-bold">{testimonial.name}</div>
-                    <div className="text-amber-300/60 text-sm">{testimonial.role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
+          {/* Two-column layout: left = testimonials (dynamic), right = feedback form */}
+          <div className={`grid md:grid-cols-2 gap-8 ${isVisible['animate-testimonials'] ? 'animate-slide-up' : ''}`}>
+            <div>
+              <Testimonials />
+            </div>
+
+            <div className="glass p-8 rounded-3xl border border-amber-500/20">
+              <h3 className="text-2xl font-bold text-amber-50 mb-4">Share Your Experience</h3>
+              <p className="text-amber-200/80 mb-6">We read every feedback — thank you for helping us improve.</p>
+              <FeedbackForm onSuccess={fetchFeedbacks} />
+            </div>
           </div>
         </div>
       </section>
@@ -552,16 +631,25 @@ function Home() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
-              <Link to="/menu" className="group relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl blur-xl opacity-60 group-hover:opacity-100 transition-opacity"></div>
-                <button className="relative bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold px-12 py-6 rounded-2xl hover:from-amber-600 hover:to-orange-700 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-2xl text-lg">
-                  <span className="flex items-center gap-3">
-                    <Coffee className="w-6 h-6" />
-                    Explore Menu
-                    <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-                  </span>
-                </button>
-              </Link>
+              <div className="flex items-center gap-6 justify-center">
+                <Link to="/menu" className="group relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl blur-xl opacity-60 group-hover:opacity-100 transition-opacity"></div>
+                  <button className="relative bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold px-12 py-6 rounded-2xl hover:from-amber-600 hover:to-orange-700 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-2xl text-lg">
+                    <span className="flex items-center gap-3">
+                      <Coffee className="w-6 h-6" />
+                      Explore Menu
+                      <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                    </span>
+                  </button>
+                </Link>
+
+                <a href="#animate-testimonials" className="group relative">
+                  <div className="absolute inset-0 bg-amber-600/10 rounded-2xl blur-xl opacity-30 group-hover:opacity-60 transition-opacity"></div>
+                  <button className="relative bg-transparent border border-amber-500 text-amber-300 font-semibold px-8 py-4 rounded-2xl hover:bg-amber-500/10 transition-all duration-300">
+                    Leave Feedback
+                  </button>
+                </a>
+              </div>
               
               <Link to="/contact" className="group relative">
                 <div className="absolute inset-0 bg-amber-500/20 rounded-2xl blur-xl group-hover:bg-amber-500/40 transition-all"></div>
